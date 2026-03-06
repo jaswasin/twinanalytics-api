@@ -1,22 +1,18 @@
 /**
  * Analytics Service
  *
- * Contains all database queries for the `analytics` resource.
- * Every query uses parameterised placeholders ($1, $2, …)
- * to prevent SQL injection.
+ * Contains business logic for the `analytics` resource.
+ * Delegates database interactions to the analyticsRepository.
  */
 
-const db = require('../config/db');
+const analyticsRepository = require('../repositories/analyticsRepository');
 
 /**
  * Retrieve all analytics records.
  * @returns {Promise<Array>}
  */
 const getAll = async () => {
-    const { rows } = await db.query(
-        'SELECT * FROM analytics ORDER BY created_at DESC'
-    );
-    return rows;
+    return await analyticsRepository.getAll();
 };
 
 /**
@@ -25,11 +21,7 @@ const getAll = async () => {
  * @returns {Promise<Object|null>}
  */
 const getById = async (id) => {
-    const { rows } = await db.query(
-        'SELECT * FROM analytics WHERE id = $1',
-        [id]
-    );
-    return rows[0] || null;
+    return await analyticsRepository.getById(id);
 };
 
 /**
@@ -37,14 +29,9 @@ const getById = async (id) => {
  * @param {{ name: string, value: number }} data
  * @returns {Promise<Object>}  The newly created record
  */
-const create = async ({ name, value }) => {
-    const { rows } = await db.query(
-        `INSERT INTO analytics (name, value, created_at, updated_at)
-     VALUES ($1, $2, NOW(), NOW())
-     RETURNING *`,
-        [name, value]
-    );
-    return rows[0];
+const create = async (data) => {
+    // Analytics-specific business logic could go here
+    return await analyticsRepository.create(data);
 };
 
 /**
@@ -53,17 +40,8 @@ const create = async ({ name, value }) => {
  * @param {{ name?: string, value?: number }} data
  * @returns {Promise<Object|null>}  The updated record, or null if not found
  */
-const update = async (id, { name, value }) => {
-    const { rows } = await db.query(
-        `UPDATE analytics
-     SET name       = COALESCE($1, name),
-         value      = COALESCE($2, value),
-         updated_at = NOW()
-     WHERE id = $3
-     RETURNING *`,
-        [name, value, id]
-    );
-    return rows[0] || null;
+const update = async (id, data) => {
+    return await analyticsRepository.update(id, data);
 };
 
 module.exports = {

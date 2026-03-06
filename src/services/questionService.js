@@ -1,21 +1,19 @@
 /**
  * Question Service
  *
- * Database queries for the `question` table.
- * All queries use parameterised placeholders to prevent SQL injection.
+ * Contains business logic for the `question` resource.
+ * Delegates database interactions to the questionRepository.
  */
 
-const db = require('../config/db');
+const questionRepository = require('../repositories/questionRepository');
 
 /**
  * Retrieve all questions.
  * @returns {Promise<Array>}
  */
 const getAll = async () => {
-    const { rows } = await db.query(
-        'SELECT * FROM public.question ORDER BY id ASC'
-    );
-    return rows;
+    // Add any necessary business logic here
+    return await questionRepository.getAll();
 };
 
 /**
@@ -24,11 +22,8 @@ const getAll = async () => {
  * @returns {Promise<Object|null>}
  */
 const getById = async (id) => {
-    const { rows } = await db.query(
-        'SELECT * FROM public.question WHERE id = $1',
-        [id]
-    );
-    return rows[0] || null;
+    // Add any necessary business logic here
+    return await questionRepository.getById(id);
 };
 
 /**
@@ -36,14 +31,9 @@ const getById = async (id) => {
  * @param {{ text: string }} data
  * @returns {Promise<Object>}
  */
-const create = async ({ text }) => {
-    const { rows } = await db.query(
-        `INSERT INTO public.question (text)
-     VALUES ($1)
-     RETURNING *`,
-        [text]
-    );
-    return rows[0];
+const create = async (data) => {
+    // Add validation or transformation logic here
+    return await questionRepository.create(data);
 };
 
 /**
@@ -52,15 +42,9 @@ const create = async ({ text }) => {
  * @param {{ text: string }} data
  * @returns {Promise<Object|null>}
  */
-const update = async (id, { text }) => {
-    const { rows } = await db.query(
-        `UPDATE public.question
-     SET text = $1
-     WHERE id = $2
-     RETURNING *`,
-        [text, id]
-    );
-    return rows[0] || null;
+const update = async (id, data) => {
+    // Add validation or transformation logic here
+    return await questionRepository.update(id, data);
 };
 
 module.exports = {
