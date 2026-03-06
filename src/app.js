@@ -9,9 +9,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
 
 const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
@@ -39,6 +41,12 @@ app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 // ─── Logging ───────────────────────────────────────────
 const logFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
 app.use(morgan(logFormat));
+
+// ─── Swagger UI ────────────────────────────────────────
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'TwinAnalytics API Docs',
+}));
 
 // ─── API Routes ────────────────────────────────────────
 app.use('/api', routes);

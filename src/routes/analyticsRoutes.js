@@ -13,10 +13,60 @@ const analyticsController = require('../controllers/analyticsController');
 
 const router = express.Router();
 
-// ─── GET /api/analytics ─────────────────────────────────
+/**
+ * @swagger
+ * /api/analytics:
+ *   get:
+ *     summary: Get all analytics records
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: List of all analytics records
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Analytics'
+ */
 router.get('/', analyticsController.getAll);
 
-// ─── GET /api/analytics/:id ─────────────────────────────
+/**
+ * @swagger
+ * /api/analytics/{id}:
+ *   get:
+ *     summary: Get an analytics record by ID
+ *     tags: [Analytics]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Analytics record ID
+ *     responses:
+ *       200:
+ *         description: A single analytics record
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Analytics'
+ *       404:
+ *         description: Record not found
+ */
 router.get(
     '/:id',
     [param('id').isInt({ min: 1 }).withMessage('ID must be a positive integer')],
@@ -24,7 +74,32 @@ router.get(
     analyticsController.getById
 );
 
-// ─── POST /api/analytics ────────────────────────────────
+/**
+ * @swagger
+ * /api/analytics:
+ *   post:
+ *     summary: Create a new analytics record
+ *     tags: [Analytics]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, value]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: page_views
+ *               value:
+ *                 type: number
+ *                 example: 1024
+ *     responses:
+ *       201:
+ *         description: Record created successfully
+ *       400:
+ *         description: Validation error
+ */
 router.post(
     '/',
     [
@@ -44,7 +119,40 @@ router.post(
     analyticsController.create
 );
 
-// ─── PUT /api/analytics/:id ─────────────────────────────
+/**
+ * @swagger
+ * /api/analytics/{id}:
+ *   put:
+ *     summary: Update an analytics record
+ *     tags: [Analytics]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: page_views
+ *               value:
+ *                 type: number
+ *                 example: 2048
+ *     responses:
+ *       200:
+ *         description: Record updated successfully
+ *       404:
+ *         description: Record not found
+ *       400:
+ *         description: Validation error
+ */
 router.put(
     '/:id',
     [
