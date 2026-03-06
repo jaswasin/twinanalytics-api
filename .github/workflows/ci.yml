@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: twinanalytics_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      PORT: 3000
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: twinanalytics_test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create test table
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d twinanalytics_test -c "
+            CREATE TABLE IF NOT EXISTS question (
+              id          SERIAL PRIMARY KEY,
+              text        TEXT NOT NULL,
+              category_id INTEGER,
+              isactive    BOOLEAN DEFAULT true,
+              type_id     INTEGER,
+              qid         VARCHAR(50)
+            );
+            INSERT INTO question (text, category_id, isactive, type_id, qid)
+            VALUES ('Sample question?', 1, true, 1, 'QID1');
+          "
+
+      - name: Start server and run health check
+        run: |
+          node server.js &
+          sleep 3
+          curl -f http://localhost:3000/api/health
+          curl -f http://localhost:3000/api/questions
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true  # No tests yet — remove this once tests are added
