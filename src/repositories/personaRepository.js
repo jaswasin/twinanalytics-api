@@ -24,7 +24,7 @@ const getAll = async () => {
  */
 const getById = async (id) => {
     const { rows } = await query(
-        'SELECT * FROM public.persona WHERE id = $1',
+        'SELECT get_digitaltwin_profile($1) as profile',
         [id]
     );
     return rows[0] || null;
