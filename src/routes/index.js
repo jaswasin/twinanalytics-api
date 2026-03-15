@@ -8,6 +8,7 @@
 const express = require('express');
 const analyticsRoutes = require('./analyticsRoutes');
 const questionRoutes = require('./questionRoutes');
+const personaRoutes = require('./personaRoutes');
 
 const router = express.Router();
 
@@ -23,5 +24,6 @@ router.get('/health', (_req, res) => {
 // ─── Feature Routes ────────────────────────────────────
 router.use('/analytics', analyticsRoutes);
 router.use('/questions', questionRoutes);
+router.use('/personas', personaRoutes);
 
 module.exports = router;
