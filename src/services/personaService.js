@@ -43,9 +43,49 @@ const update = async (id, data) => {
     return await personaRepository.update(id, data);
 };
 
+/**
+ * Retrieve a single person's details by pid.
+ * @param {number|string} pid
+ * @returns {Promise<Object|null>}
+ */
+const getPersonDetailsById = async (pid) => {
+    return await personaRepository.getPersonDetailsById(pid);
+};
+
+/**
+ * Retrieve demographic details by pid.
+ * @param {number|string} pid
+ * @returns {Promise<Object|null>}
+ */
+const getDemographicsByPid = async (pid) => {
+    return await personaRepository.getDemographicsByPid(pid);
+};
+
+/**
+ * Retrieve demographic filters.
+ * @returns {Promise<Array>}
+ */
+const getDemographicFilter = async () => {
+    return await personaRepository.getDemographicFilter();
+};
+
+/**
+ * Retrieve persons by demographic filter (tagid).
+ * @param {number|string} tagId
+ * @param {number|string} p_option_id
+ * @returns {Promise<Array>}
+ */
+const getPersonsByDemographics = async (tagId, p_option_id) => {
+    return await personaRepository.getPersonsByDemographics(tagId, p_option_id);
+};
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    getPersonDetailsById,
+    getDemographicsByPid,
+    getDemographicFilter,
+    getPersonsByDemographics,
 };

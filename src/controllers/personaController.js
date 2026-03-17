@@ -75,9 +75,79 @@ const update = asyncHandler(async (req, res) => {
     });
 });
 
+/**
+ * GET /api/personas/person/:pid
+ * Retrieve a single person's details by pid.
+ */
+const getPersonDetailsById = asyncHandler(async (req, res) => {
+    const { pid } = req.params;
+    const person = await personaService.getPersonDetailsById(pid);
+
+    if (!person) {
+        throw new AppError(`Person with pid ${pid} not found.`, 404);
+    }
+
+    res.status(200).json({
+        success: true,
+        data: person,
+    });
+});
+
+/**
+ * GET /api/personas/person/:pid/demographics
+ * Retrieve a person's demographic details by pid.
+ */
+const getDemographicsByPid = asyncHandler(async (req, res) => {
+    const { pid } = req.params;
+    const demographics = await personaService.getDemographicsByPid(pid);
+
+    if (!demographics) {
+        throw new AppError(`Demographics for person with pid ${pid} not found.`, 404);
+    }
+
+    res.status(200).json({
+        success: true,
+        data: demographics,
+    });
+});
+
+/**
+ * GET /api/personas/demographic-filters
+ * Retrieve demographic filters.
+ */
+const getDemographicFilter = asyncHandler(async (_req, res) => {
+    const filters = await personaService.getDemographicFilter();
+
+    res.status(200).json({
+        success: true,
+        count: filters.length,
+        data: filters,
+    });
+});
+
+/**
+ * GET /api/personas/demographic-filters/:tagId/persons
+ * Retrieve persons by demographic filter.
+ */
+const getPersonsByDemographics = asyncHandler(async (req, res) => {
+    const { tagId, optionid } = req.params;
+    const persons = await personaService.getPersonsByDemographics(tagId, optionid);
+
+    res.status(200).json({
+        success: true,
+        count: persons.length,
+        data: persons,
+    });
+});
+
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    getPersonDetailsById,
+    getDemographicsByPid,
+    getDemographicFilter,
+    getPersonsByDemographics,
 };

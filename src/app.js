@@ -47,6 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'TwinAnalytics API Docs',
 }));
+app.get('/api-docs-json', (req, res) => res.json(swaggerSpec));
 
 // ─── API Routes ────────────────────────────────────────
 app.use('/api', routes);
